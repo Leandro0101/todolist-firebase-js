@@ -1,3 +1,4 @@
+firebase.auth().languageCode = 'pt-BR'
 authForm.onsubmit = function (event) {
     showItem(loading)
     event.preventDefault()
@@ -35,7 +36,7 @@ function signOut() {
 function sendEmailVerification() {
     showItem(loading)
     const user = firebase.auth().currentUser
-    user.sendEmailVerification().then(function () {
+    user.sendEmailVerification(actionCodeSettings).then(function () {
         alert(`email de verificação foi enviado para ${user.email}! Acesse a sua caixa de entrada`)
     }).catch(function (error) {
         alert('Houve uma erro ao enviar o email de verificação')
