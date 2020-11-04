@@ -9,6 +9,9 @@ const userContent = document.getElementById('userContent')
 const userEmail = document.getElementById('userEmail')
 const sendEmailVerificationDiv = document.getElementById('sendEmailVerificationDiv')
 const emailVerified = document.getElementById('emailVerified')
+const passwordReset = document.getElementById('passwordReset')
+const userImg = document.getElementById('userImg')
+const userName = document.getElementById('userName')
 
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
@@ -16,6 +19,7 @@ function toggleToRegister() {
   authFormTitle.innerHTML = 'Insira seus dados para se cadastrar'
   hideItem(register)
   showItem(access)
+  hideItem(passwordReset)
 }
 
 // Alterar o formulário de autenticação para o acesso de contas já existentes
@@ -24,6 +28,7 @@ function toggleToAccess() {
   authFormTitle.innerHTML = 'Acesse a sua conta para continuar'
   hideItem(access)
   showItem(register)
+  showItem(passwordReset)
 }
 
 // Simpplifica a exibição de elementos da página
@@ -45,6 +50,9 @@ function showUserContent(user){
         emailVerified.innerHTML = 'Email não verificado'
         showItem(sendEmailVerificationDiv)
     }
+
+    userImg.src = user.photoURL ? user.photoURL : 'img/unknownUser.png'
+    userName.innerHTML = user.displayName ? user.displayName : ''
     userEmail.innerHTML = user.email
     hideItem(auth)
     showItem(userContent)
