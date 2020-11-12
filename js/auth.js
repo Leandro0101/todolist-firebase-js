@@ -85,4 +85,12 @@ function signInWithGithub(){
         hideItem(loading)
     })
 }
+function signInWithGithub(){
+    showItem(loading)
+    firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).catch(function (error){
+        alert('Houve um erro ao autenticar usando o facebook')
+        console.log(error)
+        hideItem(loading)
+    })
+}
 
