@@ -41,34 +41,34 @@ function sendEmailVerification() {
     }).catch(function (error) {
         alert('Houve uma erro ao enviar o email de verificação')
         console.log(error)
-    }).finally(function(){
+    }).finally(function () {
         hideItem(loading)
     })
 }
 
 //função que permite o usuário redefinir a sua senha
-function sendPasswordResetEmail(){
+function sendPasswordResetEmail() {
     const email = prompt('Redefinir senha! Informe o seu endereço de email', authForm.email.value)
-    if(email){
+    if (email) {
         showItem(loading)
-        firebase.auth().sendPasswordResetEmail(email, actionCodeSettings).then(function (){
+        firebase.auth().sendPasswordResetEmail(email, actionCodeSettings).then(function () {
             alert(`Email de redefinição de senha foi enviado para${email}`)
         }).catch(function (error) {
             alert('Houve um erro ao enviar email de redefinição de senha')
             console.log(error)
-        }).finally(function (){
+        }).finally(function () {
             hideItem(loading)
         })
-    }else{
+    } else {
         alert('É preciso preencher o campo de email para redefinir a senha')
     }
 }
 
 //Função que permite autenticação pelo google
 
-function signInWithGoogle(){
+function signInWithGoogle() {
     showItem(loading)
-    firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function (error){
+    firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function (error) {
         alert('Houve um erro ao autenticar usando o google')
         console.log(error)
         hideItem(loading)
@@ -77,20 +77,57 @@ function signInWithGoogle(){
 
 //Função que permite autenticação pelo github
 
-function signInWithGithub(){
+function signInWithGithub() {
     showItem(loading)
-    firebase.auth().signInWithPopup(new firebase.auth.GithubAuthProvider()).catch(function (error){
+    firebase.auth().signInWithPopup(new firebase.auth.GithubAuthProvider()).catch(function (error) {
         alert('Houve um erro ao autenticar usando o github')
         console.log(error)
         hideItem(loading)
     })
 }
-function signInWithFacebook(){
+function signInWithFacebook() {
     showItem(loading)
-    firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).catch(function (error){
+    firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).catch(function (error) {
         alert('Houve um erro ao autenticar usando o facebook')
         console.log(error)
         hideItem(loading)
     })
+}
+
+//Função que permite atualizar nome do usuário
+function updateUserName() {
+    let newUserName = prompt("Informe um novo nome de usuário", userName.innerHTML)
+
+    if (newUserName && newUserName != '') {
+        userName.innerHTML = newUserName
+        showItem(loading)
+        firebase.auth().currentUser.updateProfile({
+            displayName: newUserName
+        }).catch(function (error) {
+            alert("Houve um erro ao atualizar o nome de usuário")
+            console.log(error)
+
+        }).finally(function () {
+            hideItem(loading)
+        })
+    } else {
+        alert('Nome de usuário não ser vazio')
+    }
+}
+
+function deleteUserAccount() {
+    const confirmation = confirm('Realmente deseja excluir sua conta?')
+
+    if (confirmation) {
+        showItem(loading)
+        firebase.auth().currentUser.delete().then(function () {
+            alert('Conta excluída com sucesso')
+        }).catch(function (error) {
+            alert('Houve um erro ao remover a sua conta')
+            console.log(error)
+        }).finally(function () {
+            hideItem(loading)
+        })
+    }
 }
 
