@@ -4,15 +4,11 @@ authForm.onsubmit = function (event) {
     event.preventDefault()
     if (authForm.submitAuthForm.innerHTML == 'Acessar') {
         firebase.auth().signInWithEmailAndPassword(authForm.email.value, authForm.password.value).catch(function (error) {
-            console.log('Falha no acesso')
-            console.log(error)
-            hideItem(loading)
+            showError('Falha no acesso', error)
         })
     } else {
         firebase.auth().createUserWithEmailAndPassword(authForm.email.value, authForm.password.value).catch(function (error) {
-            console.log('Falha no cadastro')
-            console.log(error)
-            hideItem(loading)
+            showError('Falha no acesso', error)
         })
     }
 }
@@ -28,8 +24,7 @@ firebase.auth().onAuthStateChanged(function (user) {
 // Permite o user a sair da conta dele
 function signOut() {
     firebase.auth().signOut().catch(function (error) {
-        console.log('Falha ao sair da conta')
-        console.log(error)
+        showError('Falha no logout', error)
     })
 }
 
@@ -39,8 +34,7 @@ function sendEmailVerification() {
     user.sendEmailVerification(actionCodeSettings).then(function () {
         alert(`email de verificação foi enviado para ${user.email}! Acesse a sua caixa de entrada`)
     }).catch(function (error) {
-        alert('Houve uma erro ao enviar o email de verificação')
-        console.log(error)
+        showError('Falha no envio do email de verificação ', error)
     }).finally(function () {
         hideItem(loading)
     })
@@ -54,8 +48,7 @@ function sendPasswordResetEmail() {
         firebase.auth().sendPasswordResetEmail(email, actionCodeSettings).then(function () {
             alert(`Email de redefinição de senha foi enviado para${email}`)
         }).catch(function (error) {
-            alert('Houve um erro ao enviar email de redefinição de senha')
-            console.log(error)
+            showError('Falha no envio do email de redefinição de senha', error)
         }).finally(function () {
             hideItem(loading)
         })
@@ -69,8 +62,7 @@ function sendPasswordResetEmail() {
 function signInWithGoogle() {
     showItem(loading)
     firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function (error) {
-        alert('Houve um erro ao autenticar usando o google')
-        console.log(error)
+        showError('Falha na autenticação com google ', error)
         hideItem(loading)
     })
 }
@@ -81,15 +73,14 @@ function signInWithGithub() {
     showItem(loading)
     firebase.auth().signInWithPopup(new firebase.auth.GithubAuthProvider()).catch(function (error) {
         alert('Houve um erro ao autenticar usando o github')
-        console.log(error)
+        showError('Falha na autenticação com github ', error)
         hideItem(loading)
     })
 }
 function signInWithFacebook() {
     showItem(loading)
     firebase.auth().signInWithPopup(new firebase.auth.FacebookAuthProvider()).catch(function (error) {
-        alert('Houve um erro ao autenticar usando o facebook')
-        console.log(error)
+        showError('Falha na autenticação com facebook ', error)
         hideItem(loading)
     })
 }
@@ -104,9 +95,7 @@ function updateUserName() {
         firebase.auth().currentUser.updateProfile({
             displayName: newUserName
         }).catch(function (error) {
-            alert("Houve um erro ao atualizar o nome de usuário")
-            console.log(error)
-
+            showError('Falha na atualização de usuário ', error)
         }).finally(function () {
             hideItem(loading)
         })
@@ -123,8 +112,7 @@ function deleteUserAccount() {
         firebase.auth().currentUser.delete().then(function () {
             alert('Conta excluída com sucesso')
         }).catch(function (error) {
-            alert('Houve um erro ao remover a sua conta')
-            console.log(error)
+            showError('Falha ao remover sua conta ', error)
         }).finally(function () {
             hideItem(loading)
         })

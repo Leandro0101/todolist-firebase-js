@@ -13,6 +13,8 @@ const passwordReset = document.getElementById('passwordReset')
 const userImg = document.getElementById('userImg')
 const userName = document.getElementById('userName')
 
+const todoForm = document.getElementById('todoForm')
+
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
   authForm.submitAuthForm.innerHTML = 'Cadastrar conta'
@@ -71,8 +73,36 @@ function showAuth() {
   showItem(auth)
 }
 
+// centralizar e traduzir erros
+
+function showError(prefix, error){
+  console.log(error.code)
+  hideItem(loading)
+
+  switch(error.code) {
+    case 'auth/invalid-email':
+
+    case 'auth/wrong-password': alert(`${prefix}: Email ou senha inválidos`)
+    break;
+
+    case 'auth/weak-password': alert(`${prefix}: senha fraca`)
+    break;
+
+    case 'auth/email-already-in-use': alert(`${prefix}: email já cadastrado`)
+    break;
+
+    case 'auth/popup-closed-by-user': alert(`${prefix}: o popup de autenticação foi fechado antes da operação ser concluída`)
+    break;
+
+    default: alert(`${prefix} ${error.message}`)
+  }
+}
+
 //Atributos extras de configuração de email
 
 const actionCodeSettings = {
-  url: 'http://127.0.0.1:5500'
+  url: 'https://todolist-ee054.firebaseapp.com'
 }
+
+const database = firebase.database()
+const dbRefUsers = database.ref('users')
