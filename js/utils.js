@@ -14,6 +14,8 @@ const userImg = document.getElementById('userImg')
 const userName = document.getElementById('userName')
 
 const todoForm = document.getElementById('todoForm')
+const todoCount = document.getElementById('todoCount')
+const ulTodoList = document.getElementById('ulTodoList')
 
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
@@ -63,6 +65,11 @@ function showUserContent(user) {
   userName.innerHTML = user.displayName ? user.displayName : ''
   userEmail.innerHTML = user.email
   hideItem(auth)
+
+
+  dbRefUsers.child(firebase.auth().currentUser.uid).on('value', function(dataSnapshot){
+    fillTodoList(dataSnapshot)
+  })
   showItem(userContent)
 }
 
