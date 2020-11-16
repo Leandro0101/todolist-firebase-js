@@ -11,6 +11,8 @@ todoForm.onsubmit = function (event) {
         }).catch(function (error) {
             showError('Falha ao adicionar tarefa', error)
         })
+
+        todoForm.name.value = ''
     } else {
         alert('O nome da tarefa não pode estar vazio')
     }
@@ -33,6 +35,13 @@ function fillTodoList(dataSnapshot) {
         liRemoveBtn.setAttribute('onclick', `removeTodo('${item.key}')`)
         liRemoveBtn.setAttribute('class', 'danger todoBtn')
         li.appendChild(liRemoveBtn)
+
+        let liUpdateBtn = document.createElement('button')
+        liUpdateBtn.appendChild(document.createTextNode('Atualizar'))
+        liUpdateBtn.setAttribute('onclick', `updateTodo('${item.key}')`)
+        liUpdateBtn.setAttribute('class', 'alternative todoBtn')
+        li.appendChild(liUpdateBtn)
+
         ulTodoList.appendChild(li)
     })
 }
@@ -43,9 +52,32 @@ function removeTodo(key) {
     const selectedItem = document.getElementById(key)
     const confirmation = confirm(`Realmente deseja remover a tarefa "${selectedItem.innerHTML}"?`)
 
-    if(confirmation){
-        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).remove().catch(function(error){
+    if (confirmation) {
+        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).remove().then(function(){
+            console.log(`Tarefa ${selectedItem.innerHTML} removida com sucesso`);
+        }).catch(function (error) {
             showError('Falha ao remover tarefa', error);
         })
+    }
+}
+
+//update tarefas do banco de dados a
+function updateTodo(key) {
+    const selectedItem = document.getElementById(key);
+    const newTodoName = prompt(`Escolha um novo nome para a tarefa ${selectedItem.innerHTML}`, selectedItem.innerHTML);
+
+    if (newTodoName != '') {
+        const data = {
+            name: newTodoName,
+        }
+
+        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).update(data).then(function () {
+            console.log(`Tarefa ${data.name} atualizada com sucesso`);
+        }).catch(function (error) {
+            showError('Falha ao atualizar tarefa', error)
+        })
+
+    } else {
+        alert('O nome da tarefa não pode ficar em branco')
     }
 }

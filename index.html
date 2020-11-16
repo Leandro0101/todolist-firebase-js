@@ -69,7 +69,7 @@
         <p id="userEmail"></p>
         <p id="emailVerified"></p>
         <div id="sendEmailVerificationDiv">
-          <button class="alternative" onclick="updateUserName()">Verificar email</button>
+          <button class="alternative" onclick="sendEmailVerification()">Verificar email</button>
         </div>
         <button class="alternative" onclick="updateUserName()">Atualizar meu nome</button>
         <button class="alternative" onclick="signOut()">Sair</button>
@@ -80,6 +80,10 @@
 
         <div id="todoList">
           <h3 id="todoCount">Carregando tarefas...</h3>
+          <div class="center">
+            <label for="search">Buscar: </label>
+            <input type="text" placeholder="Buscar tarefas" id="search">
+          </div>
           <ul id="ulTodoList"></ul>
         </div>
 

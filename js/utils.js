@@ -17,6 +17,8 @@ const todoForm = document.getElementById('todoForm')
 const todoCount = document.getElementById('todoCount')
 const ulTodoList = document.getElementById('ulTodoList')
 
+const search = document.getElementById('search')
+
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
   authForm.submitAuthForm.innerHTML = 'Cadastrar conta'
@@ -66,11 +68,26 @@ function showUserContent(user) {
   userEmail.innerHTML = user.email
   hideItem(auth)
 
+  getDefaultTodoList()
+  search.onkeyup = function () {
+    if(search.value != ''){
+      dbRefUsers.child(user.uid).orderByChild('name').startAt(search.value).endAt(`${search.value}\uf8ff`).once('value').then(function (dataSnapshot){
+        fillTodoList(dataSnapshot)
+      })
+    }else{
+      getDefaultTodoList()
+    }
+  }
 
-  dbRefUsers.child(firebase.auth().currentUser.uid).on('value', function(dataSnapshot){
+  showItem(userContent)
+}
+
+//Busca de tarefas em tempo real(listagem padrão)
+
+function getDefaultTodoList() {
+  dbRefUsers.child(firebase.auth().currentUser.uid).orderByChild('name').on('value', function(dataSnapshot){
     fillTodoList(dataSnapshot)
   })
-  showItem(userContent)
 }
 
 function showAuth() {
