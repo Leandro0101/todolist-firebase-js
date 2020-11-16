@@ -2,6 +2,20 @@ todoForm.onsubmit = function (event) {
     event.preventDefault()
 
     if (todoForm.name.value != '') {
+        const file = todoForm.file.files[0]
+        if (file != null) {
+            if (file.type.includes('image')) {
+                const imgName = `${firebase.database().ref().push().key}-${file.name}`
+                const imgPath = `todoListFiles/${firebase.auth().currentUser.uid}/${imgName}`
+
+                const storageRef = firebase.storage().ref(imgPath)
+                const upload = storageRef.put(file)
+                trackUpload(upload)
+            } else {
+                alert('O arquivo selecionado precisa ser uma imagem, tente novamente')
+            }
+        }
+
         let data = {
             name: todoForm.name.value
         }
@@ -16,6 +30,19 @@ todoForm.onsubmit = function (event) {
     } else {
         alert('O nome da tarefa não pode estar vazio')
     }
+}
+
+function trackUpload(upload) {
+    showItem(progressFeedback)
+    upload.on('state_changed',
+        function (snapshot) {
+            console.log(snapshot)
+            progress.value = snapshot.bytesTransferred / snapshot.totalBytes * 100
+        }, function (error) {
+            showError('Houve uma falha no upload da imagem', error)
+        }, function () {
+            console.log('Sucesso no upload!')
+        })
 }
 
 //Exibir lista de tarefas de cada usuário
@@ -53,7 +80,7 @@ function removeTodo(key) {
     const confirmation = confirm(`Realmente deseja remover a tarefa "${selectedItem.innerHTML}"?`)
 
     if (confirmation) {
-        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).remove().then(function(){
+        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).remove().then(function () {
             console.log(`Tarefa ${selectedItem.innerHTML} removida com sucesso`);
         }).catch(function (error) {
             showError('Falha ao remover tarefa', error);

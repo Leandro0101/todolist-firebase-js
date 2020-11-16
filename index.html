@@ -94,8 +94,13 @@
           <h1 id="todoFormTitle">Adicionar tarefa</h1>
           <label>Tarefa</label>
           <input type="text" id="name" placeholder="tarefa">
+          <label for="img">Figura</label>
+          <input type="file" id="file" /> 
           <button type="submit" id="submitTodoForm">Adicionar tarefa</button>
         </form>
+        <div id="progressFeedback" class="startHidden">
+          <progress max="100" id="progress"></progress>
+        </div>
       </div>
 
     </div>
@@ -104,6 +109,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-storage.js"></script>
   
   <!--Nossa programação em JavaScript-->
   <script src="js/firebase.js"></script>

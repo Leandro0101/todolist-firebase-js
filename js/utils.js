@@ -19,6 +19,9 @@ const ulTodoList = document.getElementById('ulTodoList')
 
 const search = document.getElementById('search')
 
+const progressFeedback = document.getElementById('progressFeedback')
+const progress = document.getElementById('progress')
+
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
   authForm.submitAuthForm.innerHTML = 'Cadastrar conta'
