@@ -21,6 +21,8 @@ const search = document.getElementById('search')
 
 const progressFeedback = document.getElementById('progressFeedback')
 const progress = document.getElementById('progress')
+const playPauseBtn = document.getElementById('playPauseBtn')
+const cancelBtn = document.getElementById('cancelBtn')
 
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
@@ -120,6 +122,8 @@ function showError(prefix, error){
 
     case 'auth/popup-closed-by-user': alert(`${prefix}: o popup de autenticação foi fechado antes da operação ser concluída`)
     break;
+
+    case 'storage/canceled': alert(`${prefix}: upload cancelado`)
 
     default: alert(`${prefix} ${error.message}`)
   }

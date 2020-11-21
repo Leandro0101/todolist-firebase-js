@@ -10,39 +10,90 @@ todoForm.onsubmit = function (event) {
 
                 const storageRef = firebase.storage().ref(imgPath)
                 const upload = storageRef.put(file)
-                trackUpload(upload)
+
+
+                trackUpload(upload).then(function () {
+                    storageRef.getDownloadURL(upload).then(function (downloadURL) {
+                        const data = {
+                            imgUrl: downloadURL,
+                            name: todoForm.name.value
+                        }
+
+                        dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(function () {
+                            console.log(`Tarefa ${data.name} adicionada com sucesso`);
+                        }).catch(function (error) {
+                            showError('Falha ao adicionar tarefa', error)
+
+                        })
+
+                        todoForm.name.value = ''
+                        todoForm.file.value = ''
+
+                    })
+
+                }).catch(function (error) {
+                    showError('Falha ao adicionar tarefa', error)
+                })
             } else {
                 alert('O arquivo selecionado precisa ser uma imagem, tente novamente')
             }
+        } else {
+            const data = {
+                name: todoForm.name.value
+            }
+
+            dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(function () {
+                console.log(`Tarefa ${data.name} adicionada com sucesso`);
+            }).catch(function (error) {
+                showError('Falha ao adicionar tarefa', error)
+            })
+
+            todoForm.name.value = ''
         }
-
-        let data = {
-            name: todoForm.name.value
-        }
-
-        dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(function () {
-            console.log(`Tarefa ${data.name} adicionada com sucesso`);
-        }).catch(function (error) {
-            showError('Falha ao adicionar tarefa', error)
-        })
-
-        todoForm.name.value = ''
     } else {
         alert('O nome da tarefa não pode estar vazio')
     }
 }
 
 function trackUpload(upload) {
-    showItem(progressFeedback)
-    upload.on('state_changed',
-        function (snapshot) {
-            console.log(snapshot)
-            progress.value = snapshot.bytesTransferred / snapshot.totalBytes * 100
-        }, function (error) {
-            showError('Houve uma falha no upload da imagem', error)
-        }, function () {
-            console.log('Sucesso no upload!')
-        })
+    return new Promise(function (resolve, reject) {
+        showItem(progressFeedback)
+        upload.on('state_changed',
+            function (snapshot) {
+                console.log(snapshot)
+                progress.value = snapshot.bytesTransferred / snapshot.totalBytes * 100
+            }, function (error) {
+                hideItem(progressFeedback)
+                reject(error)
+            }, function () {
+                console.log('Sucesso no upload!')
+                hideItem(progressFeedback)
+                resolve()
+            })
+
+        let playPauseUpload = true
+        playPauseBtn.onclick = function () {
+            playPauseUpload = !playPauseUpload
+
+            if (playPauseUpload) {
+                upload.resume()
+
+                playPauseBtn.innerHTML = 'Pausar'
+                console.log('Upload foi retomado')
+            } else {
+                upload.pause()
+                playPauseBtn.innerHTML = 'Continuar'
+                console.log('Upload foi pausado')
+            }
+        }
+
+        cancelBtn.onclick = function () {
+            upload.cancel()
+            todoForm.file.value = ''
+            hideItem(cancelBtn)
+        }
+    })
+
 }
 
 //Exibir lista de tarefas de cada usuário
@@ -52,18 +103,24 @@ function fillTodoList(dataSnapshot) {
     const num = dataSnapshot.numChildren()
     todoCount.innerHTML = `${num} tarefas:`
     dataSnapshot.forEach(function (item) {
-        let li = document.createElement('li')
-        let spanLi = document.createElement('span')
+        const li = document.createElement('li')
+
+        const imgLi = document.createElement('img')
+        imgLi.src = item.val().imgUrl ? item.val().imgUrl : 'img/defaultTodo.png'
+        imgLi.setAttribute('class', 'imgTodo')
+        li.appendChild(imgLi)
+
+        const spanLi = document.createElement('span')
         spanLi.appendChild(document.createTextNode(item.val().name))
         spanLi.id = item.key
         li.appendChild(spanLi)
-        let liRemoveBtn = document.createElement('button')
+        const liRemoveBtn = document.createElement('button')
         liRemoveBtn.appendChild(document.createTextNode('Excluir'))
         liRemoveBtn.setAttribute('onclick', `removeTodo('${item.key}')`)
         liRemoveBtn.setAttribute('class', 'danger todoBtn')
         li.appendChild(liRemoveBtn)
 
-        let liUpdateBtn = document.createElement('button')
+        const liUpdateBtn = document.createElement('button')
         liUpdateBtn.appendChild(document.createTextNode('Atualizar'))
         liUpdateBtn.setAttribute('onclick', `updateTodo('${item.key}')`)
         liUpdateBtn.setAttribute('class', 'alternative todoBtn')
