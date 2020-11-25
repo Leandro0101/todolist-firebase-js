@@ -1,4 +1,4 @@
-todoForm.onsubmit = function (event) {
+todoForm.onsubmit = event => {
     event.preventDefault()
 
     if (todoForm.name.value != '') {
@@ -12,18 +12,17 @@ todoForm.onsubmit = function (event) {
                 const upload = storageRef.put(file)
 
 
-                trackUpload(upload).then(function () {
-                    storageRef.getDownloadURL(upload).then(function (downloadURL) {
+                trackUpload(upload).then(() => {
+                    storageRef.getDownloadURL(upload).then(downloadURL => {
                         const data = {
                             imgUrl: downloadURL,
                             name: todoForm.name.value
                         }
 
-                        dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(function () {
+                        dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(() => {
                             console.log(`Tarefa ${data.name} adicionada com sucesso`);
-                        }).catch(function (error) {
+                        }).catch(error => {
                             showError('Falha ao adicionar tarefa', error)
-
                         })
 
                         todoForm.name.value = ''
@@ -31,7 +30,7 @@ todoForm.onsubmit = function (event) {
 
                     })
 
-                }).catch(function (error) {
+                }).catch(error => {
                     showError('Falha ao adicionar tarefa', error)
                 })
             } else {
@@ -42,9 +41,9 @@ todoForm.onsubmit = function (event) {
                 name: todoForm.name.value
             }
 
-            dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(function () {
+            dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(() => {
                 console.log(`Tarefa ${data.name} adicionada com sucesso`);
-            }).catch(function (error) {
+            }).catch(error => {
                 showError('Falha ao adicionar tarefa', error)
             })
 
@@ -56,23 +55,23 @@ todoForm.onsubmit = function (event) {
 }
 
 function trackUpload(upload) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         showItem(progressFeedback)
         upload.on('state_changed',
-            function (snapshot) {
+            snapshot => {
                 console.log(snapshot)
                 progress.value = snapshot.bytesTransferred / snapshot.totalBytes * 100
-            }, function (error) {
+            }, error => {
                 hideItem(progressFeedback)
                 reject(error)
-            }, function () {
+            }, () => {
                 console.log('Sucesso no upload!')
                 hideItem(progressFeedback)
                 resolve()
             })
 
         let playPauseUpload = true
-        playPauseBtn.onclick = function () {
+        playPauseBtn.onclick = () => {
             playPauseUpload = !playPauseUpload
 
             if (playPauseUpload) {
@@ -87,7 +86,7 @@ function trackUpload(upload) {
             }
         }
 
-        cancelBtn.onclick = function () {
+        cancelBtn.onclick = () => {
             upload.cancel()
             todoForm.file.value = ''
             hideItem(cancelBtn)
@@ -102,9 +101,9 @@ function fillTodoList(dataSnapshot) {
     ulTodoList.innerHTML = ''
     const num = dataSnapshot.numChildren()
     todoCount.innerHTML = `${num} tarefas:`
-    dataSnapshot.forEach(function (item) {
+    dataSnapshot.forEach(item => {
         const li = document.createElement('li')
-
+        li.id = item.key
         const imgLi = document.createElement('img')
         imgLi.src = item.val().imgUrl ? item.val().imgUrl : 'img/defaultTodo.png'
         imgLi.setAttribute('class', 'imgTodo')
@@ -112,7 +111,7 @@ function fillTodoList(dataSnapshot) {
 
         const spanLi = document.createElement('span')
         spanLi.appendChild(document.createTextNode(item.val().name))
-        spanLi.id = item.key
+
         li.appendChild(spanLi)
         const liRemoveBtn = document.createElement('button')
         liRemoveBtn.appendChild(document.createTextNode('Excluir'))
@@ -133,31 +132,53 @@ function fillTodoList(dataSnapshot) {
 //remove tarefas do banco de dados
 
 function removeTodo(key) {
-    const selectedItem = document.getElementById(key)
-    const confirmation = confirm(`Realmente deseja remover a tarefa "${selectedItem.innerHTML}"?`)
+    const todoName = document.querySelector(`#${key} > span`)
+    const todoImg = document.querySelector(`#${key} > img`)
+
+    const confirmation = confirm(`Realmente deseja remover a tarefa "${todoName.innerHTML}"?`)
 
     if (confirmation) {
-        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).remove().then(function () {
-            console.log(`Tarefa ${selectedItem.innerHTML} removida com sucesso`);
-        }).catch(function (error) {
-            showError('Falha ao remover tarefa', error);
+        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).remove().then(() => {
+            console.log(`Tarefa ${todoName.innerHTML} removida com sucesso`);
+            removeFile(todoImg.src)
+        }).catch(error => {
+            showError('Falha ao remover tarefa', error)
         })
+    }
+}
+
+
+//Remove imagem de acordo com a tarefa removida
+function removeFile(imgUrl) {
+    console.log(imgUrl)
+
+    const result = imgUrl.indexOf('img/defaultTodo.png')
+
+    if (result === -1) {
+        firebase.storage().refFromURL(imgUrl).delete().then(() => {
+            console.log('Arquivo removido com sucesso')
+        }).catch(error => {
+            console.log('Falha ao remover arquivo')
+            console.log(error)
+        })
+    } else {
+        console.log('Nenhum arquivo removido')
     }
 }
 
 //update tarefas do banco de dados a
 function updateTodo(key) {
-    const selectedItem = document.getElementById(key);
-    const newTodoName = prompt(`Escolha um novo nome para a tarefa ${selectedItem.innerHTML}`, selectedItem.innerHTML);
+    const selectedItem = document.getElementById(key)
+    const newTodoName = prompt(`Escolha um novo nome para a tarefa ${selectedItem.innerHTML}`, selectedItem.innerHTML)
 
     if (newTodoName != '') {
         const data = {
             name: newTodoName,
         }
 
-        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).update(data).then(function () {
+        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).update(data).then(() => {
             console.log(`Tarefa ${data.name} atualizada com sucesso`);
-        }).catch(function (error) {
+        }).catch(error => {
             showError('Falha ao atualizar tarefa', error)
         })
 
