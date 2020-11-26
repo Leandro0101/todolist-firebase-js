@@ -24,6 +24,9 @@ const progress = document.getElementById('progress')
 const playPauseBtn = document.getElementById('playPauseBtn')
 const cancelBtn = document.getElementById('cancelBtn')
 
+let todoFormTitle = document.getElementById('todoFormTitle')
+const cancelupdateTodo = document.getElementById('cancelupdateTodo')
+
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
   authForm.submitAuthForm.innerHTML = 'Cadastrar conta'
