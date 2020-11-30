@@ -152,7 +152,7 @@ function removeTodo(key) {
 
 //Remove imagem de acordo com a tarefa removida
 function removeFile(imgUrl) {
-    console.log(imgUrl)
+
 
     const result = imgUrl.indexOf('img/defaultTodo.png')
 
@@ -168,7 +168,7 @@ function removeFile(imgUrl) {
     }
 }
 
-let updateTodoKey = null
+var updateTodoKey = null
 
 function updateTodo(key) {
     updateTodoKey = key
@@ -194,11 +194,11 @@ function confirmUpdateTodo() {
     hideItem(cancelupdateTodo)
 
     if (todoForm.name.value !== '') {
-        const todoImg = document.querySelector(`#${updateTodoKey} > img`)
+        const todoImg = document.querySelector('#' + updateTodoKey + ' > img')
         const file = todoForm.file.files[0]
         if (file != null) {
             if (file.type.includes('image')) {
-                const imgName = `${firebase.database().ref().push().updateTodoKey}-${file.name}`
+                const imgName = Date.now() + '-' + file.name
                 const imgPath = `todoListFiles/${firebase.auth().currentUser.uid}/${imgName}`
 
                 const storageRef = firebase.storage().ref(imgPath)
@@ -210,15 +210,8 @@ function confirmUpdateTodo() {
                             imgUrl: downloadURL,
                             name: todoForm.name.value
                         }
+                        completeTodoUpdate(data, todoImg.src)
 
-                        dbRefUsers.child(firebase.auth().currentUser.uid).child(updateTodoKey).update(data).then(() => {
-                            console.log(`Tarefa ${data.name} atualizada com sucesso`);
-                        }).catch(error => {
-                            showError('Falha ao atualizar tarefa', error)
-                        })
-                        
-                        removeFile(todoImg.src)
-                        resetTodoForm()
                     }).catch(error => {
                         showError('Falha ao atualizar tarefa ', error)
                     })
@@ -231,33 +224,24 @@ function confirmUpdateTodo() {
                 name: todoForm.name.value
             }
 
-            dbRefUsers.child(firebase.auth().currentUser.uid).child(updateTodoKey).update(data).then(() => {
-                console.log(`Tarefa ${data.name} atualizada com sucesso`);
-            }).catch(error => {
-                showError('Falha ao atualizar tarefa', error)
-            })
+            completeTodoUpdate(data)
+
         }
     } else {
         alert('O nome da tarefa não pode estar vazio')
     }
 }
-//update tarefas do banco de dados a
-function updateTodo2(key) {
-    const selectedItem = document.getElementById(key)
-    const newTodoName = prompt(`Escolha um novo nome para a tarefa ${selectedItem.children[1].innerHTML}`, selectedItem.children[1].innerHTML)
 
-    if (newTodoName != '') {
-        const data = {
-            name: newTodoName,
+function completeTodoUpdate(data, imgUrl) {
+    console.log(`IMG URL: ${imgUrl}`)
+    dbRefUsers.child(firebase.auth().currentUser.uid).child(updateTodoKey).update(data).then(() => {
+        console.log(`Tarefa ${data.name} atualizada com sucesso`)
+        if(imgUrl){
+            removeFile(imgUrl)
         }
+    }).catch(error => {
+        showError('Falha ao atualizar tarefa', error)
+    })
 
-        dbRefUsers.child(firebase.auth().currentUser.uid).child(key).update(data).then(() => {
-            console.log(`Tarefa ${data.name} atualizada com sucesso`);
-        }).catch(error => {
-            showError('Falha ao atualizar tarefa', error)
-        })
-
-    } else {
-        alert('O nome da tarefa não pode ficar em branco')
-    }
+    resetTodoForm()
 }

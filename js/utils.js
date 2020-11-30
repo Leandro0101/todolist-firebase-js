@@ -26,6 +26,7 @@ const cancelBtn = document.getElementById('cancelBtn')
 
 let todoFormTitle = document.getElementById('todoFormTitle')
 const cancelupdateTodo = document.getElementById('cancelupdateTodo')
+const submitTodoForm = document.getElementById('submitTodoForm')
 
 // Alterar o formulário de autenticação para o cadastro de novas contas
 function toggleToRegister() {
