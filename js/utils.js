@@ -128,6 +128,10 @@ function showError(prefix, error){
     break;
 
     case 'storage/canceled': alert(`${prefix}: upload cancelado`)
+    break;
+
+    case 'storage/unauthorized': alert(`${prefix}: Falha ao acessar o cloud storage`)
+    break;
 
     default: alert(`${prefix} ${error.message}`)
   }

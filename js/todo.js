@@ -5,6 +5,12 @@ todoForm.onsubmit = event => {
         const file = todoForm.file.files[0]
         if (file != null) {
             if (file.type.includes('image')) {
+
+                if (file.size > 1024 * 1024 * 2) {
+                    alert(`A imagem não pode maior que 2MB. Imagem selecionada tem: ${(file.size / 1024 / 1024).toFixed(3)}MB `)
+                    return
+                }
+
                 const imgName = `${firebase.database().ref().push().key}-${file.name}`
                 const imgPath = `todoListFiles/${firebase.auth().currentUser.uid}/${imgName}`
 
@@ -18,15 +24,7 @@ todoForm.onsubmit = event => {
                             imgUrl: downloadURL,
                             name: todoForm.name.value
                         }
-
-                        dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(() => {
-                            console.log(`Tarefa ${data.name} adicionada com sucesso`);
-                        }).catch(error => {
-                            showError('Falha ao adicionar tarefa', error)
-                        })
-
-                        todoForm.name.value = ''
-                        todoForm.file.value = ''
+                        completeTodoCreate(data)
 
                     })
 
@@ -40,18 +38,23 @@ todoForm.onsubmit = event => {
             const data = {
                 name: todoForm.name.value
             }
-
-            dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(() => {
-                console.log(`Tarefa ${data.name} adicionada com sucesso`);
-            }).catch(error => {
-                showError('Falha ao adicionar tarefa', error)
-            })
-
-            todoForm.name.value = ''
+            completeTodoCreate(data)
         }
     } else {
         alert('O nome da tarefa não pode estar vazio')
     }
+}
+
+function completeTodoCreate(data) {
+
+    dbRefUsers.child(firebase.auth().currentUser.uid).push(data).then(() => {
+        console.log(`Tarefa ${data.name} adicionada com sucesso`);
+    }).catch(error => {
+        showError('Falha ao adicionar tarefa', error)
+    })
+
+    todoForm.name.value = ''
+    todoForm.file.value = ''
 }
 
 function trackUpload(upload) {
@@ -191,12 +194,20 @@ function resetTodoForm() {
 }
 
 function confirmUpdateTodo() {
-    hideItem(cancelupdateTodo)
+
 
     if (todoForm.name.value !== '') {
         const todoImg = document.querySelector('#' + updateTodoKey + ' > img')
         const file = todoForm.file.files[0]
         if (file != null) {
+
+            if (file.size > 1024 * 1024 * 2) {
+                alert(`A imagem não pode maior que 2MB. Imagem selecionada tem: ${(file.size / 1024 / 1024).toFixed(3)}MB `)
+                return
+            }
+
+            hideItem(cancelupdateTodo)
+
             if (file.type.includes('image')) {
                 const imgName = Date.now() + '-' + file.name
                 const imgPath = `todoListFiles/${firebase.auth().currentUser.uid}/${imgName}`
@@ -236,7 +247,7 @@ function completeTodoUpdate(data, imgUrl) {
     console.log(`IMG URL: ${imgUrl}`)
     dbRefUsers.child(firebase.auth().currentUser.uid).child(updateTodoKey).update(data).then(() => {
         console.log(`Tarefa ${data.name} atualizada com sucesso`)
-        if(imgUrl){
+        if (imgUrl) {
             removeFile(imgUrl)
         }
     }).catch(error => {

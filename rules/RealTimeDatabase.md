@@ -1,4 +1,4 @@
-# padrão
+# Bloqueado
 {
   "rules": {
     ".read": "false", 
@@ -6,7 +6,7 @@
   }
 }
 
-# público
+# Testes
 
 {
   "rules": {
